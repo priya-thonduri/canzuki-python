@@ -1,12 +1,17 @@
 #!/bin/bash
 
 cd /tmp
-git clone https://github.com/priya-thonduri/canzuki-python.git
-# mkdir canzuki-python; cd canzuki-python
-# wget https://poc.canzuki.com/files/python3124.tbz
+#git clone https://github.com/priya-thonduri/canzuki-python.git
+mkdir canzuki-python; cd canzuki-python
+wget https://poc.canzuki.com/files/python3124.tbz
+wget https://poc.canzuki.com/files/canzuki-agents.tbz
 
 cd /
 tar -xjvf /tmp/canzuki-python/python3124.tbz
+cd /opt/canzuki
+tar -xjvf tmp/canzuki-python/canzuki-agents.tbz
+cd /
+
 export LD_LIBRARY_PATH=/opt/canzuki/python/3.12.4/lib
 /opt/canzuki/python/3.12.4/bin/python -V
 if [ $? -eq 0 ]; then
