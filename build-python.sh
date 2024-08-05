@@ -3,11 +3,21 @@
 # Works with Ubuntu 24.04
 apt -y install gcc g++ make bzip2 patchelf pkg-config libssl-dev libffi-dev libbz2-dev lzma-dev liblzma-dev python3-dev
 
-latest2=`curl -L https://www.python.org/ftp/python 2>/dev/null|\grep href|cut -d'>' -f2|cut -d'/' -f1|sort -n -t . -k 1,1 -k 2,2 -k 3,3|tail -2`
-latest=`echo "$latest2"|head -1`
-latestalpha=`echo "$latest2"|tail -1`
-echo "Latest version is $latest.  Latest Alpha is $latestalpha"
-[ x"$latest" == x ] && ver=3.12.4 || ver=$latest
+latest3=`curl -L https://www.python.org/ftp/python 2>/dev/null|\grep href|cut -d'>' -f2|cut -d'/' -f1|sort -n -t . -k 1,1 -k 2,2 -k 3,3|tail -3`
+latest=`echo "$latest3"|head -1`
+latestalpha=`echo "$latest3"|head -2|tail -1`
+latestalpha2=`echo "$latest3"|tail -1`
+for tryme in $latestalpha2 $latestalpha $latest; do
+ wget https://www.python.org/ftp/python/$tryme/Python-$tryme.tar.xz
+ if [ $? -eq 0 ]; then
+  echo Python-$tryme.tar.xz exists.  Aborting.
+  break
+ fi
+ tryme=""
+done
+echo "Latest versions: $latestalpha2 $latestalpha $latest"
+[ x"$tryme" == x ] && ver=3.12.4 || ver=$tryme
+echo "We will fetch $ver"
 
 ver2=`echo "$ver"|tr -d .`
 ver3=`echo "$ver"|cut -d. -f1,2`
@@ -26,7 +36,9 @@ echo "LD Dir = $lddir  Interpreter basefile=$interpreterbase"
 nproc=`cat /proc/cpuinfo |grep ^processor -c`
 echo "Number of processors=$nproc"
 cd
-wget https://www.python.org/ftp/python/$ver/Python-$ver.tar.xz
+if [ ! -e Python-$ver.tar.xz ]; then
+ wget https://www.python.org/ftp/python/$ver/Python-$ver.tar.xz
+fi
 tar -xvf Python-$ver.tar.xz
 [ $? -ne 0 ] && { echo "Problem. Aborting." ; exit ;}
 cd ~/Python-$ver
