@@ -3,8 +3,8 @@
 cd /tmp
 #git clone https://github.com/priya-thonduri/canzuki-python.git
 mkdir canzuki-python; cd canzuki-python
-wget https://poc.canzuki.com/files/python3124.tbz
-wget https://poc.canzuki.com/files/canzuki-agents.tbz
+curl -O https://poc.canzuki.com/files/python3124.tbz
+curl -O https://poc.canzuki.com/files/canzuki-agents.tbz
 
 cd /
 tar -xjvf /tmp/canzuki-python/python3124.tbz
@@ -12,6 +12,7 @@ cd /opt/canzuki
 tar -xjvf tmp/canzuki-python/canzuki-agents.tbz
 cd /
 
+oldpath=$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/opt/canzuki/python/3.12.4/lib
 /opt/canzuki/python/3.12.4/bin/python -V
 if [ $? -eq 0 ]; then
@@ -21,7 +22,10 @@ else
  echo Error. Aborting
  exit 2
 fi
-cp /tmp/canzuki-python/*.py /opt/canzuki
+LD_LIBRARY_PATH=$oldpath
+cp /tmp/canzuki-python/*.py /opt/canzuki 2>/dev/null
+mkdir /opt/canzuki/data
+mkdir /opt/canzuki/logs
 
 if [ `crontab -l|grep -v "^#"|grep -c "python.*canzuki.*py"` -gt 0 ]; then
 	echo Cron job already exists for canzuki.
